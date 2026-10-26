@@ -11,92 +11,354 @@
 //     priority is a conflict and produces no quote. No match produces no quote.
 // ===================================================================================
 {
-  "version": "placeholder-2026.10.26",
+  "version": "2.0",
   "currency": "USD",
-  "rounding": { "decimals": 2, "mode": "awayFromZero" },
-
+  "rounding": {
+    "decimals": 2,
+    "mode": "awayFromZero"
+  },
   "fields": [
     {
-      "name": "propertyType", "label": "Property type", "type": "enum", "required": true,
-      "allowedValues": ["singleFamily", "townhouse", "condo", "mobileHome"],
-      "valueLabels": { "singleFamily": "Single-family home", "townhouse": "Townhouse", "condo": "Condominium", "mobileHome": "Mobile home" }
+      "name": "propertyType",
+      "label": "Property type",
+      "type": "enum",
+      "required": true,
+      "allowedValues": [
+        "singleFamily",
+        "townhouse",
+        "condo",
+        "mobileHome"
+      ],
+      "valueLabels": {
+        "singleFamily": "Single-family home",
+        "townhouse": "Townhouse",
+        "condo": "Condominium",
+        "mobileHome": "Mobile home"
+      }
     },
     {
-      "name": "dwellingCoverage", "label": "Dwelling coverage", "type": "number", "required": true,
-      "min": 50000, "max": 2000000, "help": "USD, 50,000 to 2,000,000."
+      "name": "dwellingCoverage",
+      "label": "Dwelling coverage",
+      "type": "number",
+      "required": true,
+      "min": 50000,
+      "max": 2000000,
+      "help": "USD, 50,000 to 2,000,000."
     },
     {
-      "name": "deductible", "label": "Deductible", "type": "enum", "required": true,
-      "allowedValues": ["500", "1000", "2500"],
-      "valueLabels": { "500": "$500", "1000": "$1,000", "2500": "$2,500" }
+      "name": "deductible",
+      "label": "Deductible",
+      "type": "enum",
+      "required": true,
+      "allowedValues": [
+        "500",
+        "1000",
+        "2500"
+      ],
+      "valueLabels": {
+        "500": "$500",
+        "1000": "$1,000",
+        "2500": "$2,500"
+      }
     },
     {
-      "name": "constructionType", "label": "Construction type", "type": "enum", "required": true,
-      "allowedValues": ["frame", "masonry"],
-      "valueLabels": { "frame": "Frame", "masonry": "Masonry" }
+      "name": "constructionType",
+      "label": "Construction type",
+      "type": "enum",
+      "required": true,
+      "allowedValues": [
+        "frame",
+        "masonry"
+      ],
+      "valueLabels": {
+        "frame": "Frame",
+        "masonry": "Masonry"
+      }
     },
-    { "name": "yearBuilt", "label": "Year built", "type": "integer", "required": true, "min": 1800, "max": 2026 },
     {
-      "name": "priorClaims", "label": "Prior claims", "type": "integer", "required": true,
-      "min": 0, "max": 20, "help": "Claims in the last 5 years."
+      "name": "yearBuilt",
+      "label": "Year built",
+      "type": "integer",
+      "required": true,
+      "min": 1800,
+      "max": 2026
+    },
+    {
+      "name": "priorClaims",
+      "label": "Prior claims",
+      "type": "integer",
+      "required": true,
+      "min": 0,
+      "max": 20,
+      "help": "Claims in the last 5 years."
     }
   ],
-
   "rules": [
     {
-      "id": "elig-mobile-home", "kind": "eligibility", "priority": 100,
-      "when": [{ "field": "propertyType", "op": "eq", "value": "mobileHome" }],
-      "reject": { "code": "MOBILE_HOME_INELIGIBLE", "message": "Mobile homes are not eligible for this product." }
-    },
-    {
-      "id": "elig-claims", "kind": "eligibility", "priority": 100,
-      "when": [{ "field": "priorClaims", "op": "gte", "value": 4 }],
-      "reject": { "code": "CLAIMS_REFERRAL", "message": "Four or more prior claims require underwriter review." }
-    },
-    {
-      "id": "elig-year-built", "kind": "eligibility", "priority": 100,
-      "when": [{ "field": "yearBuilt", "op": "lt", "value": 1900 }],
-      "reject": { "code": "YEAR_BUILT_REFERRAL", "message": "Homes built before 1900 require underwriter review." }
-    },
-
-    {
-      "id": "rate-high-value", "kind": "rating", "priority": 20,
+      "id": "elig-mobile-home",
+      "kind": "eligibility",
+      "priority": 100,
       "when": [
-        { "field": "propertyType", "op": "in", "value": ["singleFamily", "townhouse"] },
-        { "field": "dwellingCoverage", "op": "gt", "value": 1000000 }
+        {
+          "field": "propertyType",
+          "op": "eq",
+          "value": "mobileHome"
+        }
+      ],
+      "reject": {
+        "code": "MOBILE_HOME_INELIGIBLE",
+        "message": "Mobile homes are not eligible for this product."
+      }
+    },
+    {
+      "id": "elig-claims",
+      "kind": "eligibility",
+      "priority": 100,
+      "when": [
+        {
+          "field": "priorClaims",
+          "op": "gte",
+          "value": 4
+        }
+      ],
+      "reject": {
+        "code": "CLAIMS_REFERRAL",
+        "message": "Four or more prior claims require underwriter review."
+      }
+    },
+    {
+      "id": "elig-year-built",
+      "kind": "eligibility",
+      "priority": 100,
+      "when": [
+        {
+          "field": "yearBuilt",
+          "op": "lt",
+          "value": 1900
+        }
+      ],
+      "reject": {
+        "code": "YEAR_BUILT_REFERRAL",
+        "message": "Homes built before 1900 require underwriter review."
+      }
+    },
+    {
+      "id": "rate-high-value",
+      "kind": "rating",
+      "priority": 20,
+      "when": [
+        {
+          "field": "propertyType",
+          "op": "in",
+          "value": [
+            "singleFamily",
+            "townhouse"
+          ]
+        },
+        {
+          "field": "dwellingCoverage",
+          "op": "gt",
+          "value": 1000000
+        }
       ],
       "basePremium": 400,
       "factors": [
-        { "op": "add", "value": 0.003, "perField": "dwellingCoverage" },
-        { "op": "multiply", "value": 0.95, "when": [{ "field": "deductible", "op": "eq", "value": "1000" }] },
-        { "op": "multiply", "value": 0.90, "when": [{ "field": "deductible", "op": "eq", "value": "2500" }] },
-        { "op": "multiply", "value": 1.15, "when": [{ "field": "constructionType", "op": "eq", "value": "frame" }] },
-        { "op": "multiply", "value": 1.10, "when": [{ "field": "yearBuilt", "op": "lt", "value": 1950 }] },
-        { "op": "multiply", "value": 1.25, "when": [{ "field": "priorClaims", "op": "gte", "value": 2 }] }
+        {
+          "op": "add",
+          "value": 0.003,
+          "perField": "dwellingCoverage"
+        },
+        {
+          "op": "multiply",
+          "value": 0.95,
+          "when": [
+            {
+              "field": "deductible",
+              "op": "eq",
+              "value": "1000"
+            }
+          ]
+        },
+        {
+          "op": "multiply",
+          "value": 0.90,
+          "when": [
+            {
+              "field": "deductible",
+              "op": "eq",
+              "value": "2500"
+            }
+          ]
+        },
+        {
+          "op": "multiply",
+          "value": 1.15,
+          "when": [
+            {
+              "field": "constructionType",
+              "op": "eq",
+              "value": "frame"
+            }
+          ]
+        },
+        {
+          "op": "multiply",
+          "value": 1.10,
+          "when": [
+            {
+              "field": "yearBuilt",
+              "op": "lt",
+              "value": 1950
+            }
+          ]
+        },
+        {
+          "op": "multiply",
+          "value": 1.25,
+          "when": [
+            {
+              "field": "priorClaims",
+              "op": "gte",
+              "value": 2
+            }
+          ]
+        }
       ]
     },
     {
-      "id": "rate-standard", "kind": "rating", "priority": 10,
-      "when": [{ "field": "propertyType", "op": "in", "value": ["singleFamily", "townhouse"] }],
+      "id": "rate-standard",
+      "kind": "rating",
+      "priority": 10,
+      "when": [
+        {
+          "field": "propertyType",
+          "op": "in",
+          "value": [
+            "singleFamily",
+            "townhouse"
+          ]
+        }
+      ],
       "basePremium": 150,
       "factors": [
-        { "op": "add", "value": 0.0035, "perField": "dwellingCoverage" },
-        { "op": "multiply", "value": 0.95, "when": [{ "field": "deductible", "op": "eq", "value": "1000" }] },
-        { "op": "multiply", "value": 0.90, "when": [{ "field": "deductible", "op": "eq", "value": "2500" }] },
-        { "op": "multiply", "value": 1.15, "when": [{ "field": "constructionType", "op": "eq", "value": "frame" }] },
-        { "op": "multiply", "value": 1.10, "when": [{ "field": "yearBuilt", "op": "lt", "value": 1950 }] },
-        { "op": "multiply", "value": 1.25, "when": [{ "field": "priorClaims", "op": "gte", "value": 2 }] }
+        {
+          "op": "add",
+          "value": 0.0035,
+          "perField": "dwellingCoverage"
+        },
+        {
+          "op": "multiply",
+          "value": 0.95,
+          "when": [
+            {
+              "field": "deductible",
+              "op": "eq",
+              "value": "1000"
+            }
+          ]
+        },
+        {
+          "op": "multiply",
+          "value": 0.9,
+          "when": [
+            {
+              "field": "deductible",
+              "op": "eq",
+              "value": "2500"
+            },
+            {
+              "field": "dwellingCoverage",
+              "op": "lt",
+              "value": 100000
+            }
+          ]
+        },
+        {
+          "op": "multiply",
+          "value": 1.15,
+          "when": [
+            {
+              "field": "constructionType",
+              "op": "eq",
+              "value": "frame"
+            }
+          ]
+        },
+        {
+          "op": "multiply",
+          "value": 1.1,
+          "when": [
+            {
+              "field": "yearBuilt",
+              "op": "lt",
+              "value": 1950
+            }
+          ]
+        },
+        {
+          "op": "multiply",
+          "value": 1.25,
+          "when": [
+            {
+              "field": "priorClaims",
+              "op": "gte",
+              "value": 2
+            }
+          ]
+        }
       ]
     },
     {
-      "id": "rate-condo", "kind": "rating", "priority": 10,
-      "when": [{ "field": "propertyType", "op": "eq", "value": "condo" }],
+      "id": "rate-condo",
+      "kind": "rating",
+      "priority": 10,
+      "when": [
+        {
+          "field": "propertyType",
+          "op": "eq",
+          "value": "condo"
+        }
+      ],
       "basePremium": 100,
       "factors": [
-        { "op": "add", "value": 0.0025, "perField": "dwellingCoverage" },
-        { "op": "multiply", "value": 0.95, "when": [{ "field": "deductible", "op": "eq", "value": "1000" }] },
-        { "op": "multiply", "value": 0.90, "when": [{ "field": "deductible", "op": "eq", "value": "2500" }] },
-        { "op": "multiply", "value": 1.25, "when": [{ "field": "priorClaims", "op": "gte", "value": 2 }] }
+        {
+          "op": "add",
+          "value": 0.0025,
+          "perField": "dwellingCoverage"
+        },
+        {
+          "op": "multiply",
+          "value": 0.95,
+          "when": [
+            {
+              "field": "deductible",
+              "op": "eq",
+              "value": "1000"
+            }
+          ]
+        },
+        {
+          "op": "multiply",
+          "value": 0.90,
+          "when": [
+            {
+              "field": "deductible",
+              "op": "eq",
+              "value": "2500"
+            }
+          ]
+        },
+        {
+          "op": "multiply",
+          "value": 1.25,
+          "when": [
+            {
+              "field": "priorClaims",
+              "op": "gte",
+              "value": 2
+            }
+          ]
+        }
       ]
     }
   ]
