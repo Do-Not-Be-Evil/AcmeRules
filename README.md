@@ -16,6 +16,24 @@ dotnet run --project src/QuoteEstimator.Web --launch-profile http
 1. Open <http://localhost:5221/quotes>.
 2. In Development you are redirected to `/dev/login`. Sign in as **Estimator**, or as **Viewer** to see the access-denied behavior.
 
+## Rules admin
+
+A separate app for creating, editing and deleting the rules in `src/QuoteEstimator.Web/Config/rules.json`:
+
+```sh
+dotnet run --project src/QuoteEstimator.RulesAdmin --launch-profile http
+```
+
+1. Open <http://localhost:5231/rules>.
+2. In Development you are redirected to `/dev/login`. Sign in as **RulesAdmin**, or as **Viewer** to see the access-denied behavior.
+
+- Each save validates the whole rule file with the same loader the quote app uses. A save that would make the file invalid is rejected, and nothing is written.
+- Each save needs a new rule set version, so quotes stay traceable to the change.
+- If the file changed since the page loaded, the save is rejected and you are asked to reload.
+- The quote app reloads the file automatically, so changes take effect without a restart.
+- Fields, currency and rounding are read-only here.
+- Saving rewrites the file: the header comment is kept, but the formatting is expanded.
+
 ## Test
 
 ```sh

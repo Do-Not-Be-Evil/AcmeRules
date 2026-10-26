@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Developer sign-in";
+}
+
+<h1>Developer sign-in</h1>
+<p class="notice">Development only. This stands in for the real identity provider and is disabled outside Development.</p>
+
+<form method="post" action="/dev/login" class="card stack">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+    <div asp-validation-summary="All" class="alert alert-error" role="alert"></div>
+
+    <div class="field">
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" value="dev.admin" required autocomplete="username" />
+    </div>
+    <div class="field">
+        <label for="role">Role</label>
+        <select id="role" name="role">
+            @foreach (var role in QuoteEstimator.RulesAdmin.Controllers.DevLoginController.Roles)
+            {
+                <option value="@role">@role</option>
+            }
+        </select>
+    </div>
+    <div class="actions">
+        <button type="submit" class="primary">Sign in</button>
+    </div>
+</form>

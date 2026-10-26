@@ -1,0 +1,100 @@
+@model RuleEditPageModel
+@{
+    var isNew = Model.RuleId is null;
+    ViewData["Title"] = isNew ? "New rule" : $"Edit {Model.RuleId}";
+}
+
+<p><a href="/rules">← All rules</a></p>
+<h1>@(isNew ? "New rule" : "Edit rule")</h1>
+
+<form id="rule-form" class="stack" novalidate data-rule-id="@Model.RuleId" aria-busy="true">
+    @Html.AntiForgeryToken()
+
+    <p id="load-status" class="status" role="status">Loading rules…</p>
+    <div id="form-messages" class="alert alert-error" role="alert" tabindex="-1" hidden></div>
+
+    <fieldset id="rule-fields" class="stack" disabled>
+        <legend class="sr-only">Rule</legend>
+
+        <section class="card stack" aria-labelledby="basics-heading">
+            <h2 id="basics-heading">Rule</h2>
+            <div class="field">
+                <label for="rule-id">Id <span class="required" aria-hidden="true">*</span></label>
+                <input id="rule-id" type="text" required autocomplete="off" spellcheck="false" aria-describedby="rule-id-help" />
+                <p id="rule-id-help" class="help">Unique. Quote responses list it as the applied rule.</p>
+            </div>
+            <div class="grid-2">
+                <div class="field">
+                    <label for="rule-kind">Kind</label>
+                    <select id="rule-kind">
+                        <option value="eligibility">Eligibility (rejects inputs)</option>
+                        <option value="rating">Rating (prices a quote)</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="rule-priority">Priority</label>
+                    <input id="rule-priority" type="number" step="1" inputmode="numeric" value="0" aria-describedby="rule-priority-help" />
+                    <p id="rule-priority-help" class="help">Higher wins. Rating rules tied at the top priority are a conflict.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card stack" aria-labelledby="when-heading">
+            <div>
+                <h2 id="when-heading">When</h2>
+                <p class="help">All conditions must match. A rating rule with no conditions always applies.</p>
+            </div>
+            <ol id="rule-conditions" class="row-list"></ol>
+            <div><button type="button" id="add-condition">Add condition</button></div>
+        </section>
+
+        <section id="eligibility-section" class="card stack" aria-labelledby="reject-heading">
+            <h2 id="reject-heading">Rejection</h2>
+            <div class="field">
+                <label for="reject-code">Code <span class="required" aria-hidden="true">*</span></label>
+                <input id="reject-code" type="text" autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="field">
+                <label for="reject-message">Message shown to the estimator <span class="required" aria-hidden="true">*</span></label>
+                <input id="reject-message" type="text" autocomplete="off" />
+            </div>
+        </section>
+
+        <section id="rating-section" class="card stack" aria-labelledby="rating-heading" hidden>
+            <h2 id="rating-heading">Premium</h2>
+            <div class="field">
+                <label for="base-premium">Base premium <span class="required" aria-hidden="true">*</span></label>
+                <input id="base-premium" type="text" inputmode="decimal" autocomplete="off" />
+            </div>
+            <div>
+                <h3>Factors</h3>
+                <p class="help">Applied in order to the running premium. A factor with conditions applies only when they all match.</p>
+            </div>
+            <ol id="rule-factors" class="row-list"></ol>
+            <div><button type="button" id="add-factor">Add factor</button></div>
+        </section>
+
+        <section class="card stack" aria-labelledby="version-heading">
+            <h2 id="version-heading">Version</h2>
+            <div class="field">
+                <label for="new-version">New rule set version <span class="required" aria-hidden="true">*</span></label>
+                <input id="new-version" type="text" required autocomplete="off" spellcheck="false" aria-describedby="new-version-help" />
+                <p id="new-version-help" class="help">Current version: <span data-current-version>…</span>. Quotes report this version.</p>
+            </div>
+        </section>
+    </fieldset>
+
+    <div class="actions">
+        <button type="submit" id="save-button" class="primary" disabled>
+            <span class="spinner" aria-hidden="true" hidden></span>
+            <span class="button-label">Save rule</span>
+        </button>
+        <a href="/rules">Cancel</a>
+        <p id="save-status" class="status" role="status" aria-live="polite"></p>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="~/js/api.js" asp-append-version="true"></script>
+    <script src="~/js/rule-editor.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,98 @@
+@model RulesPageModel
+@{
+    ViewData["Title"] = "Rules";
+    var snapshot = Model.Snapshot;
+    var ruleSet = snapshot.Load.RuleSet;
+}
+
+<div class="page-heading">
+    <h1>Quote rules</h1>
+    @if (snapshot.CanEdit)
+    {
+        <a class="button primary" href="/rules/new">New rule</a>
+    }
+</div>
+
+<p class="notice">
+    Changes are written to <code>@Model.FilePath</code> and take effect in the quote app immediately.
+    Every change needs a new rule set version.
+</p>
+
+@if (Model.SavedMessage is not null)
+{
+    <p class="alert alert-success" role="status">@Model.SavedMessage</p>
+}
+
+@if (!snapshot.CanEdit || ruleSet is null)
+{
+    <div class="alert alert-error" role="alert">
+        <p>The rule file is missing or invalid, so it cannot be edited here. Fix it by hand first.</p>
+        <ul>
+            @foreach (var error in snapshot.Load.Errors)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+}
+else
+{
+    <p>Rule set version <strong>@ruleSet.Version</strong> · @ruleSet.Rules.Count rules</p>
+
+    <div class="table-wrap card">
+        <table id="rules-table" data-etag="@snapshot.Etag">
+            <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Kind</th>
+                    <th scope="col" class="num">Priority</th>
+                    <th scope="col">When</th>
+                    <th scope="col">Outcome</th>
+                    <th scope="col"><span class="sr-only">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rule in ruleSet.Rules.OrderBy(r => r.Kind).ThenByDescending(r => r.Priority).ThenBy(r => r.Id, StringComparer.Ordinal))
+                {
+                    <tr>
+                        <td><code>@rule.Id</code></td>
+                        <td><span class="tag tag-@rule.Kind.ToString().ToLowerInvariant()">@rule.Kind</span></td>
+                        <td class="num">@rule.Priority</td>
+                        <td>@RuleDisplay.Conditions(rule.When)</td>
+                        <td>@RuleDisplay.Outcome(rule)</td>
+                        <td class="cell-actions">
+                            <a href="/rules/@Uri.EscapeDataString(rule.Id)/edit">Edit</a>
+                            <button type="button" class="link-button danger" data-delete-rule="@rule.Id">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <dialog id="delete-dialog" aria-labelledby="delete-heading">
+        <form id="delete-form" class="stack" novalidate>
+            @Html.AntiForgeryToken()
+            <h2 id="delete-heading">Delete rule <code data-rule-name></code>?</h2>
+            <p>The quote app stops using the rule as soon as it is deleted.</p>
+            <div id="delete-messages" class="alert alert-error" role="alert" tabindex="-1" hidden></div>
+            <div class="field">
+                <label for="delete-version">New rule set version <span class="required" aria-hidden="true">*</span></label>
+                <input id="delete-version" type="text" required autocomplete="off" spellcheck="false" aria-describedby="delete-version-help" />
+                <p id="delete-version-help" class="help">Current version: @ruleSet.Version</p>
+            </div>
+            <div class="actions">
+                <button type="submit" id="delete-confirm" class="primary danger">
+                    <span class="spinner" aria-hidden="true" hidden></span>
+                    <span class="button-label">Delete rule</span>
+                </button>
+                <button type="button" id="delete-cancel">Cancel</button>
+            </div>
+        </form>
+    </dialog>
+}
+
+@section Scripts {
+    <script src="~/js/api.js" asp-append-version="true"></script>
+    <script src="~/js/rules-index.js" asp-append-version="true"></script>
+}

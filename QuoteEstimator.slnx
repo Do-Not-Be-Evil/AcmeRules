@@ -1,5 +1,7 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/QuoteEstimator.Rules/QuoteEstimator.Rules.csproj" />
+    <Project Path="src/QuoteEstimator.RulesAdmin/QuoteEstimator.RulesAdmin.csproj" />
     <Project Path="src/QuoteEstimator.Web/QuoteEstimator.Web.csproj" />
   </Folder>
   <Folder Name="/tests/">

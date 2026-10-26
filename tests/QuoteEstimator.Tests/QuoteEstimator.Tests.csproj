@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <Using Include="QuoteEstimator.Rules" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +28,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\QuoteEstimator.Web\QuoteEstimator.Web.csproj" />
+    <!-- Aliased: both apps get a generated public Program class, which would otherwise be ambiguous. -->
+    <ProjectReference Include="..\..\src\QuoteEstimator.RulesAdmin\QuoteEstimator.RulesAdmin.csproj" Aliases="RulesAdmin" />
   </ItemGroup>
 
 </Project>

@@ -6,4 +6,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Using Include="QuoteEstimator.Rules" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\QuoteEstimator.Rules\QuoteEstimator.Rules.csproj" />
+  </ItemGroup>
+
 </Project>
