@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/QuoteEstimator.Web/QuoteEstimator.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/QuoteEstimator.Tests/QuoteEstimator.Tests.csproj" />
+  </Folder>
+</Solution>

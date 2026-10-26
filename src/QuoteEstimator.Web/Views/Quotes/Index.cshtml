@@ -1,0 +1,109 @@
+@using System.Globalization
+@model QuoteFormViewModel
+@{
+    ViewData["Title"] = "Generate quote";
+    var ruleSet = Model.RuleSet;
+    static string? Invariant(decimal? value) => value?.ToString(CultureInfo.InvariantCulture);
+}
+
+<h1>Generate quote</h1>
+
+@if (ruleSet is null)
+{
+    <div class="alert alert-error" role="alert">
+        Quote generation is currently unavailable because the quote rules could not be loaded. Try again later or contact support.
+    </div>
+}
+else
+{
+    <form id="quote-form" class="card" action="/api/quotes" method="post" novalidate
+          data-currency="@ruleSet.Currency" data-timeout-ms="15000">
+        @Html.AntiForgeryToken()
+
+        <div id="form-messages" class="alert alert-error" role="alert" tabindex="-1" hidden></div>
+
+        <fieldset id="quote-fields" class="stack">
+            <legend class="sr-only">Quote inputs</legend>
+            @foreach (var field in ruleSet.Fields)
+            {
+                var id = "field-" + field.Name;
+                var errorId = id + "-error";
+                var helpId = id + "-help";
+                var describedBy = field.Help is null ? errorId : $"{helpId} {errorId}";
+
+                <div class="field">
+                    <label for="@id">
+                        @field.Label
+                        @if (field.Required)
+                        {
+                            <span class="required" aria-hidden="true">*</span>
+                        }
+                    </label>
+
+                    @if (field.Type == FieldType.Enum)
+                    {
+                        <select id="@id" name="@field.Name" data-field="@field.Name" data-type="string"
+                                required="@field.Required" aria-describedby="@describedBy">
+                            <option value="">Select…</option>
+                            @foreach (var value in field.AllowedValues!)
+                            {
+                                var text = field.ValueLabels?.GetValueOrDefault(value) ?? value;
+                                <option value="@value">@text</option>
+                            }
+                        </select>
+                    }
+                    else if (field.IsNumeric)
+                    {
+                        <input id="@id" name="@field.Name" data-field="@field.Name" data-type="number"
+                               type="number" inputmode="@(field.Type == FieldType.Integer ? "numeric" : "decimal")"
+                               step="@(field.Type == FieldType.Integer ? "1" : "any")"
+                               min="@Invariant(field.Min)" max="@Invariant(field.Max)"
+                               required="@field.Required" aria-describedby="@describedBy" />
+                    }
+                    else
+                    {
+                        <input id="@id" name="@field.Name" data-field="@field.Name" data-type="string"
+                               type="text" maxlength="@field.MaxLength"
+                               required="@field.Required" aria-describedby="@describedBy" />
+                    }
+
+                    @if (field.Help is not null)
+                    {
+                        <p id="@helpId" class="help">@field.Help</p>
+                    }
+                    <p id="@errorId" class="field-error" hidden></p>
+                </div>
+            }
+        </fieldset>
+
+        <div class="actions">
+            <button type="submit" id="generate-button" class="primary">
+                <span class="spinner" aria-hidden="true" hidden></span>
+                <span class="button-label">Generate quote</span>
+            </button>
+            <p id="quote-status" class="status" role="status" aria-live="polite"></p>
+        </div>
+
+        <div id="quote-failure" class="alert alert-error" role="alert" hidden>
+            <p class="failure-message"></p>
+            <button type="button" id="retry-button">Retry</button>
+        </div>
+    </form>
+
+    <section id="quote-result" class="card quote-result" aria-labelledby="quote-result-heading" tabindex="-1" hidden>
+        <h2 id="quote-result-heading">Quote</h2>
+        <p class="premium" data-premium></p>
+        <dl>
+            <dt>Rule set version</dt>
+            <dd data-version></dd>
+            <dt>Applied rule</dt>
+            <dd data-rules></dd>
+        </dl>
+    </section>
+
+    <p class="notice">Rule set version: @ruleSet.Version</p>
+}
+
+@section Scripts {
+    <script src="~/js/quote-form.js" asp-append-version="true"></script>
+}

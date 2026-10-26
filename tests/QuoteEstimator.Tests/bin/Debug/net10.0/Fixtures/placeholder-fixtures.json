@@ -1,0 +1,69 @@
+// PLACEHOLDER FIXTURES for the placeholder rule set in src/QuoteEstimator.Web/Config/rules.json.
+// Expected premiums were calculated by hand from those rules, independently of the code.
+// Replace with the approved input → expected-outcome fixtures before release.
+//
+// expected.outcome: success | fieldErrors | ruleViolations | noApplicableRule | conflict
+[
+  {
+    "name": "standard-single-family-masonry",
+    // 150 + 300000*0.0035 = 1200; *0.95 (deductible 1000) = 1140
+    "input": { "propertyType": "singleFamily", "dwellingCoverage": 300000, "deductible": "1000", "constructionType": "masonry", "yearBuilt": 1995, "priorClaims": 0 },
+    "expected": { "outcome": "success", "premium": 1140.00, "appliedRuleIds": ["rate-standard"] }
+  },
+  {
+    "name": "standard-townhouse-frame-old-with-claims",
+    // 150 + 875 = 1025; *1.15 = 1178.75; *1.10 = 1296.625; *1.25 = 1620.78125 → 1620.78
+    "input": { "propertyType": "townhouse", "dwellingCoverage": 250000, "deductible": "500", "constructionType": "frame", "yearBuilt": 1940, "priorClaims": 2 },
+    "expected": { "outcome": "success", "premium": 1620.78, "appliedRuleIds": ["rate-standard"] }
+  },
+  {
+    "name": "condo-high-deductible",
+    // 100 + 120000*0.0025 = 400; *0.90 = 360
+    "input": { "propertyType": "condo", "dwellingCoverage": 120000, "deductible": "2500", "constructionType": "masonry", "yearBuilt": 2010, "priorClaims": 0 },
+    "expected": { "outcome": "success", "premium": 360.00, "appliedRuleIds": ["rate-condo"] }
+  },
+  {
+    "name": "high-value-takes-precedence-over-standard",
+    // rate-high-value (priority 20) beats rate-standard (10): 400 + 4500 = 4900; *0.90 = 4410
+    "input": { "propertyType": "singleFamily", "dwellingCoverage": 1500000, "deductible": "2500", "constructionType": "masonry", "yearBuilt": 2005, "priorClaims": 1 },
+    "expected": { "outcome": "success", "premium": 4410.00, "appliedRuleIds": ["rate-high-value"] }
+  },
+  {
+    "name": "coverage-exactly-at-high-value-threshold-is-standard",
+    // gt 1000000 does not match 1000000: 150 + 3500 = 3650
+    "input": { "propertyType": "singleFamily", "dwellingCoverage": 1000000, "deductible": "500", "constructionType": "masonry", "yearBuilt": 2000, "priorClaims": 0 },
+    "expected": { "outcome": "success", "premium": 3650.00, "appliedRuleIds": ["rate-standard"] }
+  },
+  {
+    "name": "midpoint-rounds-away-from-zero",
+    // 100 + 50002*0.0025 = 225.005 → 225.01
+    "input": { "propertyType": "condo", "dwellingCoverage": 50002, "deductible": "500", "constructionType": "masonry", "yearBuilt": 2000, "priorClaims": 0 },
+    "expected": { "outcome": "success", "premium": 225.01, "appliedRuleIds": ["rate-condo"] }
+  },
+  {
+    "name": "three-claims-is-below-referral-threshold",
+    // 150 + 700 = 850; *0.95 = 807.5; *1.25 = 1009.375 → 1009.38
+    "input": { "propertyType": "singleFamily", "dwellingCoverage": 200000, "deductible": "1000", "constructionType": "masonry", "yearBuilt": 1990, "priorClaims": 3 },
+    "expected": { "outcome": "success", "premium": 1009.38, "appliedRuleIds": ["rate-standard"] }
+  },
+  {
+    "name": "mobile-home-is-ineligible",
+    "input": { "propertyType": "mobileHome", "dwellingCoverage": 80000, "deductible": "500", "constructionType": "frame", "yearBuilt": 2000, "priorClaims": 0 },
+    "expected": { "outcome": "ruleViolations", "codes": ["MOBILE_HOME_INELIGIBLE"] }
+  },
+  {
+    "name": "all-matching-eligibility-rules-are-reported",
+    "input": { "propertyType": "singleFamily", "dwellingCoverage": 300000, "deductible": "500", "constructionType": "masonry", "yearBuilt": 1899, "priorClaims": 4 },
+    "expected": { "outcome": "ruleViolations", "codes": ["CLAIMS_REFERRAL", "YEAR_BUILT_REFERRAL"] }
+  },
+  {
+    "name": "missing-required-fields",
+    "input": { "propertyType": "singleFamily" },
+    "expected": { "outcome": "fieldErrors", "fields": ["constructionType", "deductible", "dwellingCoverage", "priorClaims", "yearBuilt"] }
+  },
+  {
+    "name": "coverage-below-minimum",
+    "input": { "propertyType": "singleFamily", "dwellingCoverage": 49999, "deductible": "500", "constructionType": "masonry", "yearBuilt": 2000, "priorClaims": 0 },
+    "expected": { "outcome": "fieldErrors", "fields": ["dwellingCoverage"] }
+  }
+]
