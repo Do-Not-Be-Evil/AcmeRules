@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace QuoteEstimator.Web.Rules;
+namespace QuoteEstimator.Rules;
 
 /// <summary>
 /// An immutable, versioned set of quote-generation rules loaded from configuration.

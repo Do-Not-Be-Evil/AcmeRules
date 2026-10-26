@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace QuoteEstimator.Web.Rules;
+namespace QuoteEstimator.Rules;
 
 public sealed record RuleSetLoadResult(RuleSet? RuleSet, IReadOnlyList<string> Errors)
 {

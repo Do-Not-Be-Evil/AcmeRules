@@ -79,7 +79,7 @@ public partial class QuotesApiTests(QuoteAppFactory factory) : IClassFixture<Quo
         Assert.Equal(1140.00m, body.GetProperty("premium").GetDecimal());
         Assert.Equal("USD", body.GetProperty("currency").GetString());
         Assert.Equal("rate-standard", body.GetProperty("appliedRuleIds")[0].GetString());
-        Assert.StartsWith("placeholder-", body.GetProperty("ruleSetVersion").GetString());
+        Assert.Equal(ShippedRules.Version, body.GetProperty("ruleSetVersion").GetString());
     }
 
     [Fact]

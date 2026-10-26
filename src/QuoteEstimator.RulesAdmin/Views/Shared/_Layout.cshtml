@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] · Rules Admin</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="/rules">Quote Rules Admin</a>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <form class="signout" method="post" action="/dev/logout">
+                @Html.AntiForgeryToken()
+                <span class="user">@User.Identity.Name</span>
+                <button type="submit" class="link-button">Sign out</button>
+            </form>
+        }
+    </header>
+    <main class="container">
+        @RenderBody()
+    </main>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
